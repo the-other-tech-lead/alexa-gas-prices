@@ -12,5 +12,5 @@ functions:
   gasPrices:
     handler: handler.hello
     events:
-      - alexaSkill: amzn1.ask.skill.b1950752-46a5-4b68-8c67-d18750ba45c4
+      - alexaSkill: ${env:ALEXA_SKILL_ID}
 
