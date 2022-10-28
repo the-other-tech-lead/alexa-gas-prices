@@ -1,0 +1,13 @@
+org: theothertechlead
+app: alexa-gas-prices
+service: alexa-gas-prices
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+
+functions:
+  hello:
+    handler: handler.hello
