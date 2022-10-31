@@ -2,7 +2,9 @@
 const chromium = require("@sparticuz/chrome-aws-lambda");
 const playwright = require('playwright-core');
 const Alexa = require('ask-sdk-core');
-
+const {DateTime} = require('luxon');
+const AWS = require("aws-sdk");
+const dynamo = new AWS.DynamoDB.DocumentClient();
 
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
@@ -10,7 +12,7 @@ const LaunchRequestHandler = {
     },
     handle(handlerInput) {
         const speakOutput = 'Welcome, you can say Hello or Help. Which would you like to try?';
-
+         
         return handlerInput.responseBuilder
             .speak(speakOutput)
             .reprompt(speakOutput)
@@ -26,7 +28,21 @@ const GetGasPriceIntentHandler = {
     async handle(handlerInput) {
         let text = null;
         let browser = null;
-
+        let today = DateTime.now().setZone('America/New_York').toLocaleString(DateTime.DATE_MED_WITH_WEEKDAY);
+        let yesterday = DateTime.now().setZone('America/New_York').minus({days:1}).toLocaleString(DateTime.DATE_MED_WITH_WEEKDAY);
+        //see if there is acahced response for today
+        try{
+           const cachedResponse = await getFromCache(today);
+           const yesterdaysResponse = await getFromCache(yesterday);
+           if(cachedResponse.Item?.text && (yesterdaysResponse.Item?.text !== cachedResponse.Item?.text)){
+            return handlerInput.responseBuilder
+            .speak(cachedResponse.Item?.text)
+            //.reprompt('add a reprompt if you want to keep the session open for the user to respond')
+            .getResponse();
+           }
+        }catch(e){
+            console.error('Error getting cache text',e);
+        }
         try {
             browser = await playwright.chromium.launch({
                 args: chromium.args,
@@ -52,6 +68,10 @@ const GetGasPriceIntentHandler = {
             const p = await page.$('#post-content-area > p');
             const note = await p.innerText();
             text = text + " " + note;
+            await saveToCache({
+                date: today,
+                text: text
+            });
         } catch (error) {
             return callback(error);
         } finally {
@@ -172,6 +192,41 @@ const ErrorHandler = {
             .getResponse();
     }
 };
+
+const getFromCache = async function(date){
+    try{
+        const body = await dynamo
+        .get({
+            TableName: "gas-prices",
+            Key: {
+                date: date 
+            }
+            })
+            .promise();
+        return body;   
+    }catch(e){
+        console.error(e);
+        throw e;
+    }
+}
+
+const saveToCache = async function(body){
+    try{
+        await dynamo
+          .put({
+            TableName: "gas-prices",
+            Item: {
+              date: body.date,
+              text: body.text
+            }
+          })
+          .promise();
+        return `Cached ${body}`;
+    }catch(e){
+        console.error(e);
+        throw e;
+    }
+}
 
 /**
  * This handler acts as the entry point for your skill, routing all request and response
