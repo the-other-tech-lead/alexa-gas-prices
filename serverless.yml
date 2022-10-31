@@ -4,13 +4,21 @@ service: alexa-gas-prices
 
 frameworkVersion: '3'
 
+package:
+  exclude:
+    - chrome-aws-lambda/**
+    - node_modules/chrome-aws-lambda/**
+    - node_modules/puppeteer/**
+
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs16.x
 
 functions:
   gasPrices:
-    handler: handler.hello
+    handler: handler.handler
+    memorySize: 1600
+    timeout: 30
     events:
       - alexaSkill: ${env:ALEXA_SKILL_ID}
 

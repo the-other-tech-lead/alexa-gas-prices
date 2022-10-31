@@ -1,0 +1,27 @@
+{
+  "name": "alexa-gas-prices",
+  "version": "1.0.0",
+  "description": "<!-- title: 'AWS NodeJS Example' description: 'This template demonstrates how to deploy a NodeJS function running on AWS Lambda using the traditional Serverless Framework.' layout: Doc framework: v3 platform: AWS language: nodeJS priority: 1 authorLink: 'https://github.com/serverless' authorName: 'Serverless, inc.' authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4' -->",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/the-other-tech-lead/alexa-gas-prices.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/the-other-tech-lead/alexa-gas-prices/issues"
+  },
+  "homepage": "https://github.com/the-other-tech-lead/alexa-gas-prices#readme",
+  "dependencies": {
+    "ask-sdk-core": "^2.7.0",
+    "ask-sdk-model": "^1.19.0",
+    "aws-sdk": "^2.326.0",
+    "cheerio": "^1.0.0-rc.12",
+    "chrome-aws-lambda": "^10.1.0",
+    "playwright-core": "^1.27.1"
+  }
+}
